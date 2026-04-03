@@ -115,7 +115,7 @@
 </template>
 
 <script setup>
-const config = useRuntimeConfig()
+const { apiFetch } = useApi()
 const activeTab = ref('article')
 const tabs = [
   { id: 'article', label: '✍️ Générer article' },
@@ -148,7 +148,7 @@ const generateArticle = async () => {
   form.append('notes', notes.value)
   form.append('use_rag', useRag.value)
   try {
-    articleResult.value = await $fetch(`${config.public.apiBase}/api/v1/pipeline/generate-article`, { method: 'POST', body: form })
+    articleResult.value = await apiFetch('/api/v1/pipeline/generate-article', { method: 'POST', body: form })
   } finally { genLoading.value = false }
 }
 
@@ -159,7 +159,7 @@ const checkCoherence = async () => {
   form.append('article', article.value)
   form.append('stats', stats.value)
   try {
-    coherenceResult.value = await $fetch(`${config.public.apiBase}/api/v1/pipeline/check-coherence`, { method: 'POST', body: form })
+    coherenceResult.value = await apiFetch('/api/v1/pipeline/check-coherence', { method: 'POST', body: form })
   } finally { checkLoading.value = false }
 }
 
@@ -170,7 +170,7 @@ const synthesize = async () => {
   form.append('question', synthQuestion.value)
   form.append('sources', synthSources.value)
   try {
-    synthResult.value = await $fetch(`${config.public.apiBase}/api/v1/pipeline/synthesize`, { method: 'POST', body: form })
+    synthResult.value = await apiFetch('/api/v1/pipeline/synthesize', { method: 'POST', body: form })
   } finally { synthLoading.value = false }
 }
 

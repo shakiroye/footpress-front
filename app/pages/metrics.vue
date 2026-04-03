@@ -68,12 +68,12 @@
 </template>
 
 <script setup>
-const config = useRuntimeConfig()
+const { apiFetch } = useApi()
 const metrics = ref(null)
 
 const loadMetrics = async () => {
   try {
-    metrics.value = await $fetch(`${config.public.apiBase}/metrics`)
+    metrics.value = await apiFetch('/metrics')
   } catch {}
 }
 

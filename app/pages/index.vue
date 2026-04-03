@@ -112,7 +112,7 @@
 </template>
 
 <script setup>
-const config = useRuntimeConfig()
+const { apiFetch } = useApi()
 const text = ref('')
 const imageFile = ref(null)
 const loading = ref(false)
@@ -133,11 +133,7 @@ const analyze = async () => {
   if (imageFile.value) form.append('file', imageFile.value)
 
   try {
-    const data = await $fetch(`${config.public.apiBase}/api/v1/analyze/`, {
-      method: 'POST',
-      body: form
-    })
-    result.value = data
+    result.value = await apiFetch('/api/v1/analyze/', { method: 'POST', body: form })
   } catch (e) {
     error.value = e.message || 'Erreur lors de l\'analyse'
   } finally {

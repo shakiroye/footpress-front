@@ -1,7 +1,16 @@
 <template>
   <div class="max-w-4xl mx-auto p-8">
-    <h1 class="text-2xl font-bold mb-2">📚 Archives RAG</h1>
-    <p class="text-gray-400 mb-6 text-sm">Uploadez vos PDFs et interrogez vos archives avec la recherche vectorielle.</p>
+    <div class="flex items-start justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold mb-2">📚 Archives RAG</h1>
+        <p class="text-gray-400 text-sm">Uploadez vos PDFs et interrogez vos archives avec la recherche vectorielle.</p>
+      </div>
+      <div v-if="user" class="bg-gray-900 border border-gray-700 rounded-xl px-4 py-2 text-xs text-right">
+        <p class="text-gray-500">Espace isolé de</p>
+        <p class="text-green-400 font-semibold mt-0.5">{{ user.avatar }} {{ user.name }}</p>
+        <p class="text-gray-600 font-mono mt-0.5">{{ user.id }}/</p>
+      </div>
+    </div>
 
     <div class="grid grid-cols-2 gap-6 mb-6">
       <!-- Upload -->
@@ -86,7 +95,8 @@
 </template>
 
 <script setup>
-const config = useRuntimeConfig()
+const { apiFetch } = useApi()
+const { user } = useAuth()
 const uploadFile = ref(null)
 const uploading = ref(false)
 const uploadResult = ref(null)
@@ -106,7 +116,7 @@ const upload = async () => {
   const form = new FormData()
   form.append('file', uploadFile.value)
   try {
-    uploadResult.value = await $fetch(`${config.public.apiBase}/api/v1/rag/upload`, { method: 'POST', body: form })
+    uploadResult.value = await apiFetch('/api/v1/rag/upload', { method: 'POST', body: form })
     await loadFiles()
   } catch(e) {
     uploadResult.value = { indexation: { success: false, error: e.message } }
@@ -117,7 +127,7 @@ const upload = async () => {
 
 const loadFiles = async () => {
   try {
-    const data = await $fetch(`${config.public.apiBase}/api/v1/rag/files`)
+    const data = await apiFetch('/api/v1/rag/files')
     files.value = data.files || []
   } catch {}
 }
@@ -129,7 +139,7 @@ const query = async () => {
   form.append('question', question.value)
   if (sourceFilter.value) form.append('source', sourceFilter.value)
   try {
-    queryResult.value = await $fetch(`${config.public.apiBase}/api/v1/rag/query`, { method: 'POST', body: form })
+    queryResult.value = await apiFetch('/api/v1/rag/query', { method: 'POST', body: form })
   } catch(e) {
     queryResult.value = { answer: `Erreur : ${e.message}`, sources_used: [], nb_chunks_retrieved: 0 }
   } finally {
